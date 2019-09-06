@@ -96,6 +96,12 @@ class TeamCityFormatter implements FormatterInterface
 			if ( true === isset($metaParams) && true === is_array($metaParams) ) {
 				$this->printEvent('testMetadata', $metaParams );	
 			}
+			exec( 'tail -n1 /tmp/php-errors', $php_errors );
+			$this->printEvent('testMetadata', array(
+				'testName' => $testName,
+				'name'     => 'errorLog',
+				'value'    => join( "\n", $php_errors ),
+			));
         } elseif ($event->getResult() == StepEvent::PENDING) {
             $this->printEvent('testIgnored', $params);
         } elseif ($event->getResult() == StepEvent::SKIPPED) {
