@@ -35,7 +35,7 @@ default:
 
 or use the formatter via --format / -f params:
 
-````
+```
 behat -f "Behat\TeamCity\TeamCityFormatter"
 behat --format="Behat\TeamCity\TeamCityFormatter"
 ```
