@@ -64,9 +64,10 @@ class TeamCityFormatter implements FormatterInterface
      */
     public function afterStep(StepEvent $event)
     {
-    	$step   = $event->getStep();
-        $params = [
-            'name'=>$event->getStep()->getParent()->getTitle(),
+    	$step     = $event->getStep();
+    	$testName = $step->getParent()->getTitle();
+        $params   = [
+        	'name'=> $testName,
         ];
         if($event->getResult() == StepEvent::FAILED) {
 			if ( $step->hasArguments() ) {
@@ -74,6 +75,7 @@ class TeamCityFormatter implements FormatterInterface
 					$params['type'] = 'comparisonFailure';
 					$params['expected'] = $step->getText() . ' ' . (string) $arg;
 					$output = explode( "\n", $event->getException()->getMessage() );
+					$command = $output[0];
 					$stdout = $output[1];
 					$stderr = $output[2];
 					if ( false !== strpos( $step->getText(), 'STDOUT' ) ) {
@@ -83,9 +85,17 @@ class TeamCityFormatter implements FormatterInterface
 					}  else {
 						$params['actual'] = 'STDOUT: ' . $stdout . '|nSTDERR: ' . $stderr;
 					}
+					$metaParams = array(
+						'testName' => $testName,
+						'name'     => 'command',
+						'value'    => $command,
+					);
 				}	
 			}
-            $this->printEvent('testFailed', $params);
+			$this->printEvent('testFailed', $params);
+			if ( true === isset($metaParams) && true === is_array($metaParams) ) {
+				$this->printEvent('testMetadata', $metaParams );	
+			}
         } elseif ($event->getResult() == StepEvent::PENDING) {
             $this->printEvent('testIgnored', $params);
         } elseif ($event->getResult() == StepEvent::SKIPPED) {
