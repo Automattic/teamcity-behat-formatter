@@ -1,7 +1,7 @@
-teamcity-behat-formatter
+teamcity-behat-formatter-for-2.x
 ========================
 
-Behat tests formatter for TeamCity
+Behat 2.x tests formatter for TeamCity
 
 behat.xml:
 
