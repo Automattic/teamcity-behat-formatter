@@ -1,4 +1,4 @@
-teamcity-behat-formatter-for-2.x
+teamcity-behat-2-formatter
 ========================
 
 Behat 2.x tests formatter for TeamCity
