@@ -191,5 +191,18 @@ class TeamCityFormatter implements FormatterInterface
     public static function printText($text)
     {
         file_put_contents('php://stderr', $text);
-    }
+	}
+
+	/**
+ 	 * @param string $text
+ 	 * @return string Properly escaped input.
+ 	 */
+	public static function escapeValue($text)
+	{
+		return \str_replace(
+			['|', "'", "\n", "\r", ']', '['],
+			['||', "|'", '|n', '|r', '|]', '|['],
+			$text
+		);
+	}
 }
