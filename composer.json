@@ -8,9 +8,14 @@
     "license": "MIT License",
     "authors": [
         {
+            "name": "Vaidas Mikalauskas",
+            "email": "vaidas.mikalauskas@gmai.com"
+        },
+        {
             "name": "david-binda",
             "email": "david.binovec@gmail.com"
         }
+
     ],
     "require": {},
     "autoload": {
