@@ -64,11 +64,44 @@ class TeamCityFormatter implements FormatterInterface
      */
     public function afterStep(StepEvent $event)
     {
-        $params = [
-            'name'=>$event->getStep()->getParent()->getTitle(),
+    	$step     = $event->getStep();
+    	$testName = $step->getParent()->getTitle();
+        $params   = [
+        	'name'=> $testName,
         ];
         if($event->getResult() == StepEvent::FAILED) {
-            $this->printEvent('testFailed', $params);
+			if ( $step->hasArguments() ) {
+				foreach( $step->getArguments() as $arg ) {
+					$params['type'] = 'comparisonFailure';
+					$params['expected'] = $step->getText() . ' ' . (string) $arg;
+					$output = explode( "\n", $event->getException()->getMessage() );
+					$command = $output[0];
+					$stdout = $output[1];
+					$stderr = $output[2];
+					if ( false !== strpos( $step->getText(), 'STDOUT' ) ) {
+						$params['actual'] = $stdout;
+					} else if ( false !== strpos( $step->getText(), 'STDERR' ) ) {
+						$params['actual'] = $stderr;
+					}  else {
+						$params['actual'] = 'STDOUT: ' . $stdout . '|nSTDERR: ' . $stderr;
+					}
+					$metaParams = array(
+						'testName' => $testName,
+						'name'     => 'command',
+						'value'    => $command,
+					);
+				}	
+			}
+			$this->printEvent('testFailed', $params);
+			if ( true === isset($metaParams) && true === is_array($metaParams) ) {
+				$this->printEvent('testMetadata', $metaParams );	
+			}
+			exec( 'tail -n1 /tmp/php-errors', $php_errors );
+			$this->printEvent('testMetadata', array(
+				'testName' => $testName,
+				'name'     => 'errorLog',
+				'value'    => join( "\n", $php_errors ),
+			));
         } elseif ($event->getResult() == StepEvent::PENDING) {
             $this->printEvent('testIgnored', $params);
         } elseif ($event->getResult() == StepEvent::SKIPPED) {
@@ -180,7 +213,8 @@ class TeamCityFormatter implements FormatterInterface
     {
         self::printText("\n##teamcity[$eventName");
         foreach ($params as $key => $value) {
-            self::printText(" $key='$value'");
+			$escapedValue = self::escapeValue( (string) $value );
+            self::printText(" $key='$escapedValue'");
         }
         self::printText("]\n");
     }
@@ -192,4 +226,20 @@ class TeamCityFormatter implements FormatterInterface
     {
         file_put_contents('php://stderr', $text);
     }
+
+	/**
+ 	 * @param string $text
+ 	 * @return string Properly escaped input.
+ 	 */
+	public static function escapeValue($text)
+	{
+		if ( true === empty($text) || null === $text ) {
+			$text = 'null';	
+		}
+		return \str_replace(
+			['|', "'", "\n", "\r", ']', '['],
+			['||', "|'", '|n', '|r', '|]', '|['],
+			$text
+		);
+	}
 }
