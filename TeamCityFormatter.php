@@ -1,5 +1,7 @@
 <?php
 
+namespace Behat\TeamCity;
+
 use Behat\Behat\Event\FeatureEvent;
 use Behat\Behat\Event\ScenarioEvent;
 use Behat\Behat\Event\StepEvent;
