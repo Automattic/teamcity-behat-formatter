@@ -36,7 +36,7 @@ class TeamCityFormatter implements FormatterInterface
     {
         $events = array(
             'afterStep',
-            'beforeStep',
+//            'beforeStep',
             'beforeFeature', 'afterFeature',
             'beforeScenario', 'afterScenario',
 //            'beforeSuite', 'afterSuite',
