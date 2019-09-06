@@ -199,6 +199,9 @@ class TeamCityFormatter implements FormatterInterface
  	 */
 	public static function escapeValue($text)
 	{
+		if ( true === empty($text) || null === $text ) {
+			$text = 'null';	
+		}
 		return \str_replace(
 			['|', "'", "\n", "\r", ']', '['],
 			['||', "|'", '|n', '|r', '|]', '|['],
