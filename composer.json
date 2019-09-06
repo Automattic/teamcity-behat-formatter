@@ -1,0 +1,21 @@
+{
+    "name": "automattic/teamcity-behat-2-formatter",
+    "description": "Behat 2.x formatter for TeamCity",
+    "version": "1.0.0",
+    "require-dev": {
+        "behat/behat": "2.5.5"
+    },
+    "license": "MIT License",
+    "authors": [
+        {
+            "name": "david-binda",
+            "email": "david.binovec@gmail.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+    	"psr-4": {
+    		"Behat\\TeamCity\\": "src/"
+    	}	
+    }
+}
