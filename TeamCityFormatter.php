@@ -180,7 +180,8 @@ class TeamCityFormatter implements FormatterInterface
     {
         self::printText("\n##teamcity[$eventName");
         foreach ($params as $key => $value) {
-            self::printText(" $key='$value'");
+			$escapedValue = self::escapeValue( (string) $value );
+            self::printText(" $key='$escapedValue'");
         }
         self::printText("]\n");
     }
@@ -192,4 +193,17 @@ class TeamCityFormatter implements FormatterInterface
     {
         file_put_contents('php://stderr', $text);
     }
+
+	/**
+ 	 * @param string $text
+ 	 * @return string Properly escaped input.
+ 	 */
+	public static function escapeValue($text)
+	{
+		return \str_replace(
+			['|', "'", "\n", "\r", ']', '['],
+			['||', "|'", '|n', '|r', '|]', '|['],
+			$text
+		);
+	}
 }
