@@ -64,10 +64,27 @@ class TeamCityFormatter implements FormatterInterface
      */
     public function afterStep(StepEvent $event)
     {
+    	$step   = $event->getStep();
         $params = [
             'name'=>$event->getStep()->getParent()->getTitle(),
         ];
         if($event->getResult() == StepEvent::FAILED) {
+			if ( $step->hasArguments() ) {
+				foreach( $step->getArguments() as $arg ) {
+					$params['type'] = 'comparisonFailure';
+					$params['expected'] = $step->getText() . ' ' . (string) $arg;
+					$output = explode( "\n", $event->getException()->getMessage() );
+					$stdout = $output[1];
+					$stderr = $output[2];
+					if ( false !== strpos( $step->getText(), 'STDOUT' ) ) {
+						$params['actual'] = $stdout;
+					} else if ( false !== strpos( $step->getText(), 'STDERR' ) ) {
+						$params['actual'] = $stderr;
+					}  else {
+						$params['actual'] = 'STDOUT: ' . $stdout . '|nSTDERR: ' . $stderr;
+					}
+				}	
+			}
             $this->printEvent('testFailed', $params);
         } elseif ($event->getResult() == StepEvent::PENDING) {
             $this->printEvent('testIgnored', $params);
