@@ -10,3 +10,10 @@ default:
   formatter:
     name: Behat\TeamCity\TeamCityFormatter
 </pre>
+
+or use the --format / -f option:
+
+<pre>
+behat -f "Behat\TeamCity\TeamCityFormatter"
+behat --format="Behat\TeamCity\TeamCityFormatter"
+</pre>
