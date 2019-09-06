@@ -74,9 +74,10 @@ class TeamCityFormatter implements FormatterInterface
 				foreach( $step->getArguments() as $arg ) {
 					$params['type'] = 'comparisonFailure';
 					$params['expected'] = $step->getText() . ' ' . (string) $arg;
-					$output = explode( "\n", $event->getException()->getMessage() );
-					$stdout = $output[1];
-					$stderr = $output[2];
+					$output  = explode( "\n", $event->getException()->getMessage() );
+					$command = $output[0]
+					$stdout  = $output[1];
+					$stderr  = $output[2];
 					if ( false !== strpos( $step->getText(), 'STDOUT' ) ) {
 						$params['actual'] = $stdout;
 					} else if ( false !== strpos( $step->getText(), 'STDERR' ) ) {
@@ -84,9 +85,17 @@ class TeamCityFormatter implements FormatterInterface
 					} else {
 						$params['actual'] = 'STDOUT: ' . $stdout . '|nSTDERR: ' . $stderr;	
 					}
+					$metaParams = array(
+						'testName' => $testName,
+						'name'     => 'command',
+						'value'    => $command,
+					);
 				}	
 			}
             $this->printEvent('testFailed', $params);
+			if ( true === isset($metaParams) && true === is_array($metaParams) ) {
+				$this->printEvent('testMetadata', $metaParams );	
+			}
         } elseif ($event->getResult() == StepEvent::PENDING) {
             $this->printEvent('testIgnored', $params);
         } elseif ($event->getResult() == StepEvent::SKIPPED) {
