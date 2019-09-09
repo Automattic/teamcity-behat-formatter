@@ -77,9 +77,12 @@ class TeamCityFormatter implements FormatterInterface
 					$params['type'] = 'comparisonFailure';
 					$params['expected'] = $step->getText() . ' ' . (string) $arg;
 					$output = explode( "\n", $event->getException()->getMessage() );
-					$command = $output[0];
-					$stdout = $output[1];
-					$stderr = $output[2];
+					$command = array_shift( $output ); // Is always the first element.
+					$exit_status = array_pop( $output ); // Is always the last one.
+					$cwd = array_pop( $output ); // Is just before the exit status.
+					// Going backwards, next one (or more?) is STDERR. Let's pretend, for now, that it's a single line.
+					$stderr = array_pop( $output );
+					$stdout = join( "\n", $output ); // Let's presume that any extra rows are the STDOUT.
 					if ( false !== strpos( $step->getText(), 'STDOUT' ) ) {
 						$params['actual'] = $stdout;
 					} else if ( false !== strpos( $step->getText(), 'STDERR' ) ) {
